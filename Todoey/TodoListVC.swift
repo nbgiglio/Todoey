@@ -11,7 +11,7 @@ import UIKit
 
 class TodoListVC: UITableViewController {
     
-    let itemArray = ["Find Mike","Buy Eggos", "Destroy Demogorgon"]
+    var itemArray = ["Find Mike","Buy Eggos", "Destroy Demogorgon"]
     
     
 
@@ -25,11 +25,6 @@ class TodoListVC: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
 
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemArray.count
     }
@@ -37,9 +32,7 @@ class TodoListVC: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
-        
         cell.textLabel?.text = itemArray[indexPath.row]
-
         return cell
         
     }
@@ -53,9 +46,36 @@ class TodoListVC: UITableViewController {
         }
         
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    //MARK - Add New Items
+    @IBAction func addBtnPressed(_ sender: UIBarButtonItem) {
         
+        var textField = UITextField()
         
+        let alert = UIAlertController(title: "Add New ToDoey Item", message: "", preferredStyle: .alert)
+        
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Create new item"
+            textField = alertTextField
+        }
+        
+        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+            //What happens after Add Item Clicked
+            if textField.text == "" {
+                textField.text = "Blank Cell Added"
+            }
+
+            self.itemArray.append(textField.text!)
+            self.tableView.reloadData()
+        }
+        
+        alert.addAction(action)
+        
+        present(alert, animated: true, completion: nil)
         
     }
+    
+    
 
 }
