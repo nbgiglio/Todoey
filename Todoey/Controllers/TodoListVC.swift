@@ -10,7 +10,7 @@ import UIKit
 import RealmSwift
 
 
-class TodoListVC: UITableViewController {
+class TodoListVC: SwipeTableVC {
     
     let realm = try! Realm()
     
@@ -36,7 +36,7 @@ class TodoListVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         if itemResults?.count == 0 {
             cell.textLabel?.text = "No Items Added"
@@ -107,19 +107,24 @@ class TodoListVC: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-//    func saveItems(){
-//
-//        do {
-//            try context.save()
-//        } catch {
-//            print("Error saving item \(error)")
-//        }
-//    }
-//
+    //MARK: - Model Manipulation Methods
+    
     func loadItems(){
         
         itemResults = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
         tableView.reloadData()
+    }
+    
+    override func updateModel(indexPath: IndexPath) {
+        if let itemForDeletion = self.itemResults?[indexPath.row]{
+            do {
+                try self.realm.write{
+                    self.realm.delete(itemForDeletion)
+                }
+            } catch {
+                print("Error deleting item \(error)")
+            }
+        }
     }
     
     

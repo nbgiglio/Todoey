@@ -8,14 +8,18 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
-class CategoryVC: UITableViewController {
+class CategoryVC: SwipeTableVC {
     
     let realm = try! Realm()
     var categoryResults : Results<Category>?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tableView.separatorStyle = .none
+
         loadCategories()
     }
     
@@ -33,6 +37,18 @@ class CategoryVC: UITableViewController {
             }
         } catch {
             print("Error saving category \(error)")
+        }
+    }
+    
+    override func updateModel(indexPath: IndexPath) {
+        if let categoryForDeletion = self.categoryResults?[indexPath.row] {
+            do {
+                try self.realm.write{
+                    self.realm.delete(categoryForDeletion)
+                }
+            } catch {
+                print("Error saving category \(error)")
+            }
         }
     }
     
@@ -83,8 +99,11 @@ class CategoryVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell" , for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+
         cell.textLabel?.text = (categoryResults?.count == 0) ? "No Categories Added Yet" : categoryResults?[indexPath.row].name
+        
+        cell.backgroundColor = UIColor.randomFlat
 
         return cell
     }
